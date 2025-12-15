@@ -38,60 +38,42 @@ const TrackCard = ({ track, queue = [], showDelete = true }) => {
         }
     };
 
-    // Format duration - handles both string "MM:SS" and numeric seconds
+    // Format duration string/seconds
     const formatDuration = (duration) => {
         if (!duration && duration !== 0) {
             return '--:--';
         }
-
-        // If already in MM: SS format (string with colon)
-        if (typeof duration === 'string' && duration.includes(': ')) {
-            return duration;
-        }
-
-        // If it's a numeric string or number, convert to MM:SS
+        if (typeof duration === 'string' && duration.includes(':')) return duration;
         const seconds = Number(duration);
-        if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) {
-            return duration.toString() || '--:--';
-        }
-
+        if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) return '--:--';
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const subtitle = track.album || null;
+    // Robustly support title field
+    const displayTitle = track.title || track.name || 'Untitled';
+
+    const subtitle = track.album || track.albumName || null;
 
     return (
         <div
-            className="flex items-center gap-2 sm:gap-3 p-3 bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer transition-all"
+            className="flex items-center gap-3 p-3 bg-base-200 hover:bg-base-300 rounded-lg cursor-pointer transition-all"
             onClick={handlePlay}
         >
-            {/* Play Icon */}
-            <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-base-300 hover:bg-primary hover:text-primary-content rounded-full flex-shrink-0 transition-colors">
+            <div className="w-10 h-10 flex items-center justify-center bg-base-300 hover:bg-primary hover:text-primary-content rounded-full flex-shrink-0 transition-colors">
                 <span className="text-sm">▶️</span>
             </div>
-
-            {/* Track Info */}
             <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">
-                    {track.title || 'Untitled'}
-                </p>
+                <p className="font-medium text-sm truncate">{displayTitle}</p>
                 {subtitle && (
-                    <p className="text-xs text-base-content/60 truncate">
-                        {subtitle}
-                    </p>
+                    <p className="text-xs text-base-content/60 truncate">{subtitle}</p>
                 )}
             </div>
-
-            {/* Duration */}
-            <span className="text-xs text-base-content/50 tabular-nums hidden sm:block">
-        {formatDuration(track.duration)}
-      </span>
-
-            {/* Actions - Always visible */}
+            <span className="text-xs text-base-content/50 tabular-nums min-w-[45px] text-right">
+                {formatDuration(track.duration)}
+            </span>
             <div className="flex items-center gap-1">
-                {/* Download Button */}
                 <button
                     className="btn btn-ghost btn-xs btn-circle"
                     onClick={handleDownload}
@@ -99,8 +81,6 @@ const TrackCard = ({ track, queue = [], showDelete = true }) => {
                 >
                     ⬇️
                 </button>
-
-                {/* Add to Queue Button */}
                 <button
                     className="btn btn-ghost btn-xs btn-circle"
                     onClick={handleAddToQueue}
@@ -108,8 +88,6 @@ const TrackCard = ({ track, queue = [], showDelete = true }) => {
                 >
                     ➕
                 </button>
-
-                {/* Delete Button (Admin only) */}
                 {isAdmin && showDelete && (
                     <button
                         className="btn btn-ghost btn-xs btn-circle text-error"

@@ -16,7 +16,7 @@ import { TrackCard, AlbumCard } from '../components/cards';
 const SearchIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
         <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16. 65" y2="16.65" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
 );
 
@@ -35,7 +35,7 @@ const Search = () => {
     }, [query]);
 
     useEffect(() => {
-        if (debouncedQuery. trim()) {
+        if (debouncedQuery.trim()) {
             dispatch(searchTracks(debouncedQuery));
             dispatch(searchAlbums(debouncedQuery));
         } else {
@@ -51,13 +51,12 @@ const Search = () => {
         };
     }, [dispatch]);
 
-    const hasResults = trackResults. length > 0 || albumResults.length > 0;
-    const isSearching = trackLoading && debouncedQuery. trim();
+    const hasResults = trackResults.length > 0 || albumResults.length > 0;
+    const isSearching = trackLoading && Boolean(debouncedQuery.trim());
 
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold">Search</h1>
-
             {/* Search Input */}
             <label className="input input-bordered flex items-center gap-2">
                 <input
@@ -68,39 +67,44 @@ const Search = () => {
                     onChange={(e) => setQuery(e.target.value)}
                     autoFocus
                 />
-                {isSearching ?  (
+                {isSearching ? (
                     <span className="loading loading-spinner loading-sm" />
                 ) : (
                     <SearchIcon />
                 )}
             </label>
-
             {/* Results */}
-            {debouncedQuery. trim() ? (
+            {debouncedQuery.trim() ? (
                 <div className="space-y-8">
                     {albumResults.length > 0 && (
                         <section>
                             <h2 className="text-xl font-bold mb-4">Albums</h2>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                 {albumResults.slice(0, 6).map((album, index) => (
-                                    <AlbumCard key={album.id || album.album || index} album={album} />
+                                    <AlbumCard
+                                        key={album.id || album.album || album.name || index}
+                                        album={album}
+                                    />
                                 ))}
                             </div>
                         </section>
                     )}
-
                     {trackResults.length > 0 && (
                         <section>
                             <h2 className="text-xl font-bold mb-4">Tracks</h2>
-                            <div className="grid grid-cols-2 sm: grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                                {trackResults.map((track) => (
-                                    <TrackCard key={track.fileHash} track={track} queue={trackResults} />
+                            <div className="space-y-2">
+                                {trackResults.map((track, idx) => (
+                                    <TrackCard
+                                        key={track.fileHash || idx}
+                                        track={track}
+                                        queue={trackResults}
+                                        showDelete={false}
+                                    />
                                 ))}
                             </div>
                         </section>
                     )}
-
-                    {! isSearching && ! hasResults && (
+                    {!isSearching && !hasResults && (
                         <div className="text-center py-12">
                             <p className="text-6xl mb-4">😕</p>
                             <p className="text-base-content/50">No results found for "{debouncedQuery}"</p>
