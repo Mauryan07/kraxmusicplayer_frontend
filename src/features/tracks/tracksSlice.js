@@ -14,9 +14,8 @@ export const fetchTracks = createAsyncThunk(
 
             return {
                 content: tracks,
-                page: page,
+                page:  page,
                 size:  size,
-                // If we got exactly 'size' tracks, there might be more
                 hasMore: tracks.length >= size,
             };
         } catch (error) {
@@ -26,12 +25,13 @@ export const fetchTracks = createAsyncThunk(
     }
 );
 
+// Updated to match backend endpoint:  /api/search/title? name=query
 export const searchTracks = createAsyncThunk(
     'tracks/searchTracks',
     async (query, { rejectWithValue }) => {
         try {
             const response = await httpClient.get('/api/search/title', {
-                params: { query },
+                params: { name: query },
             });
             return response.data;
         } catch (error) {
@@ -85,7 +85,7 @@ const initialState = {
 };
 
 const tracksSlice = createSlice({
-    name: 'tracks',
+    name:  'tracks',
     initialState,
     reducers: {
         clearSearchResults: (state) => {
@@ -139,7 +139,7 @@ const tracksSlice = createSlice({
                 state.searchResults = state.searchResults.filter((t) => t.fileHash !== action.payload);
             })
             .addCase(deleteTrack.rejected, (state) => {
-                state.deleteLoading = false;
+                state. deleteLoading = false;
             })
             .addCase(deleteAllTracks.pending, (state) => {
                 state.deleteLoading = true;
@@ -160,16 +160,14 @@ const tracksSlice = createSlice({
 
 export const { clearSearchResults, clearTracksError, resetTracks } = tracksSlice. actions;
 
-// Simple selectors
-export const selectTracks = (state) => state.tracks.items;
+export const selectTracks = (state) => state.tracks. items;
 export const selectTracksLoading = (state) => state.tracks.loading;
-export const selectTracksError = (state) => state.tracks. error;
+export const selectTracksError = (state) => state.tracks.error;
 export const selectSearchResults = (state) => state.tracks. searchResults;
 export const selectSearchLoading = (state) => state.tracks.searchLoading;
 export const selectTracksPage = (state) => state.tracks.page;
 export const selectTracksHasMore = (state) => state.tracks.hasMore;
 
-// Memoized selector for pagination
 const selectTracksState = (state) => state.tracks;
 
 export const selectTracksPagination = createSelector(
@@ -178,8 +176,8 @@ export const selectTracksPagination = createSelector(
         page: tracks.page,
         size: tracks.size,
         hasMore: tracks.hasMore,
-        totalFetched: tracks. totalFetched,
+        totalFetched:  tracks.totalFetched,
     })
 );
 
-export default tracksSlice.reducer;
+export default tracksSlice. reducer;

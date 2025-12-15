@@ -1,30 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { playTrack } from '../../features/player/playerSlice';
 import { getApiBase } from '../../api/httpClient';
 
 const AlbumCard = ({ album }) => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const handleClick = () => {
         const albumId = album.id || encodeURIComponent(album.album || album.name);
         navigate(`/albums/${albumId}`);
     };
 
-    const handlePlayAlbum = (e) => {
-        e.stopPropagation();
-        if (album.tracks && album.tracks. length > 0) {
-            dispatch(playTrack({ track: album.tracks[0], queue: album.tracks }));
-        }
-    };
-
     // Get artwork URL from first track's fileHash
     const getArtworkUrl = () => {
         const fileHash = album.firstTrackHash ||
-            album.coverHash ||
-            album.tracks?.[0]?. fileHash;
+        album.coverHash ||
+        album.tracks?.[0]?.fileHash;
 
         if (fileHash && fileHash !== 'artwork') {
             return `${getApiBase()}/api/track/${fileHash}/artwork`;
@@ -56,16 +46,6 @@ const AlbumCard = ({ album }) => {
                         💿
                     </div>
                 )}
-
-                {/* Play overlay */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover: opacity-100 transition-opacity flex items-center justify-center">
-                    <button
-                        className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-content text-xl shadow-lg"
-                        onClick={handlePlayAlbum}
-                    >
-                        ▶️
-                    </button>
-                </div>
 
                 {/* Track count badge */}
                 {trackCount > 0 && (

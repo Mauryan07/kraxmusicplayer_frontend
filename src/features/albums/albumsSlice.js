@@ -8,7 +8,7 @@ export const fetchAlbums = createAsyncThunk(
             const response = await httpClient.get('/api/albums');
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?. data?.message || 'Failed to load albums');
+            return rejectWithValue(error.response?.data?.message || 'Failed to load albums');
         }
     }
 );
@@ -25,15 +25,17 @@ export const fetchAlbumById = createAsyncThunk(
     }
 );
 
+// Search albums endpoint:  /api/search/album? name=query
 export const searchAlbums = createAsyncThunk(
     'albums/searchAlbums',
     async (query, { rejectWithValue }) => {
         try {
             const response = await httpClient.get('/api/search/album', {
-                params: { query },
+                params: { name:  query },
             });
-            return response.data;
+            return response. data;
         } catch (error) {
+            console.error('searchAlbums error:', error.response?.data || error.message);
             return rejectWithValue(error.response?.data?.message || 'Search failed');
         }
     }
@@ -41,16 +43,15 @@ export const searchAlbums = createAsyncThunk(
 
 const initialState = {
     items: [],
-    byId: {},
     currentAlbum: null,
     loading: false,
-    error:  null,
+    error: null,
     searchResults: [],
-    searchLoading:  false,
+    searchLoading: false,
 };
 
 const albumsSlice = createSlice({
-    name: 'albums',
+    name:  'albums',
     initialState,
     reducers: {
         clearCurrentAlbum: (state) => {
@@ -63,32 +64,28 @@ const albumsSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchAlbums.pending, (state) => {
-                state. loading = true;
-                state.error = null;
+                state.loading = true;
+                state. error = null;
             })
             .addCase(fetchAlbums.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload || [];
-                action.payload?. forEach((album) => {
-                    state.byId[album.id || album.album] = album;
-                });
             })
             .addCase(fetchAlbums.rejected, (state, action) => {
                 state. loading = false;
                 state.error = action.payload;
             })
-            .addCase(fetchAlbumById.pending, (state) => {
+            .addCase(fetchAlbumById. pending, (state) => {
                 state. loading = true;
+                state.error = null;
             })
             .addCase(fetchAlbumById.fulfilled, (state, action) => {
-                state.loading = false;
-                state. currentAlbum = action.payload;
-                const id = action.payload. id || action.payload.album;
-                if (id) state.byId[id] = action.payload;
+                state. loading = false;
+                state.currentAlbum = action. payload;
             })
             .addCase(fetchAlbumById.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action. payload;
+                state. loading = false;
+                state.error = action.payload;
             })
             .addCase(searchAlbums.pending, (state) => {
                 state.searchLoading = true;
@@ -107,9 +104,10 @@ const albumsSlice = createSlice({
 export const { clearCurrentAlbum, clearAlbumSearchResults } = albumsSlice.actions;
 
 export const selectAlbums = (state) => state.albums.items;
-export const selectAlbumsLoading = (state) => state.albums.loading;
 export const selectCurrentAlbum = (state) => state.albums.currentAlbum;
-export const selectAlbumById = (id) => (state) => state.albums.byId[id];
-export const selectAlbumSearchResults = (state) => state.albums. searchResults;
+export const selectAlbumsLoading = (state) => state.albums.loading;
+export const selectAlbumsError = (state) => state.albums.error;
+export const selectAlbumSearchResults = (state) => state.albums.searchResults;
+export const selectAlbumSearchLoading = (state) => state.albums.searchLoading;
 
-export default albumsSlice.reducer;
+export default albumsSlice. reducer;
