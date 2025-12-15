@@ -1,0 +1,47 @@
+.marquee-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    height: 2.5em;
+}
+
+.marquee-fade-left,
+.marquee-fade-right {
+    pointer-events: none;
+    position: absolute;
+    width: 2em;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+}
+.marquee-fade-left {
+    left: 0;
+    background: linear-gradient(to right, #1a1a1a 75%, transparent); /* match your bg-base-200 or bg-base-300! */
+}
+.marquee-fade-right {
+    right: 0;
+    background: linear-gradient(to left, #1a1a1a 75%, transparent); /* match bg */
+}
+
+.marquee {
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+    min-width: 100%;
+}
+
+.marquee-animate {
+    /* The magic: scroll the length of one item, at a controlled speed */
+    animation: marquee-scroll 12s linear infinite;
+}
+
+@keyframes marquee-scroll {
+    0% {
+        transform: translate3d(0,0,0);
+    }
+    100% {
+        transform: translate3d(-50%,0,0);
+    }
+}
