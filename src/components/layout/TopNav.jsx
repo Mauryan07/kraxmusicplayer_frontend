@@ -58,7 +58,7 @@ const TopNav = () => {
                 </div>
                 {/* Logo */}
                 <Link to="/" className="btn btn-ghost text-xl">
-                    🎵 KraxMusic
+                    KraxMusic
                 </Link>
             </div>
 

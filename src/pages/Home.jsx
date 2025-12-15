@@ -36,7 +36,7 @@ const Home = () => {
             <div className="hero bg-gradient-to-br from-primary/20 via-base-200 to-secondary/20 rounded-2xl py-16">
                 <div className="hero-content text-center">
                     <div className="max-w-lg">
-                        <h1 className="text-5xl font-bold">🎵 KraxMusic</h1>
+                        <h1 className="text-5xl font-bold">KraxMusic</h1>
                         <p className="py-6 text-base-content/70 text-lg">
                             Your personal music streaming experience
                         </p>
