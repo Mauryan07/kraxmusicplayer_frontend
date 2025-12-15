@@ -30,8 +30,22 @@ const QueueList = ({ isOpen, onClose }) => {
         }
     };
 
-    const formatDuration = (seconds) => {
-        if (! seconds || isNaN(seconds)) return '--:--';
+    // Format duration - handles both string "MM:SS" and numeric seconds
+    const formatDuration = (duration) => {
+        if (!duration && duration !== 0) {
+            return '--:--';
+        }
+
+        // If already in MM: SS format
+        if (typeof duration === 'string' && duration.includes(':')) {
+            return duration;
+        }
+
+        const seconds = Number(duration);
+        if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) {
+            return duration.toString() || '--:--';
+        }
+
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -54,7 +68,7 @@ const QueueList = ({ isOpen, onClose }) => {
                     <div>
                         <h2 className="text-lg font-bold">🎵 Queue</h2>
                         <p className="text-sm text-base-content/60">
-                            {queue. length} {queue.length === 1 ? 'track' : 'tracks'}
+                            {queue.length} {queue.length === 1 ? 'track' : 'tracks'}
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -74,10 +88,10 @@ const QueueList = ({ isOpen, onClose }) => {
 
                 {/* Queue Items */}
                 <div className="flex-1 overflow-y-auto p-2">
-                    {queue. length > 0 ? (
+                    {queue.length > 0 ? (
                         <div className="space-y-1">
                             {queue.map((track, index) => {
-                                const isPlaying = currentTrack?. fileHash === track.fileHash && index === currentIndex;
+                                const isPlaying = currentTrack?.fileHash === track.fileHash && index === currentIndex;
 
                                 return (
                                     <div
@@ -85,13 +99,13 @@ const QueueList = ({ isOpen, onClose }) => {
                                         className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all group ${
                                             isPlaying
                                                 ? 'bg-primary/20 border border-primary/30'
-                                                :  'bg-base-200 hover: bg-base-300'
+                                                : 'bg-base-200 hover:bg-base-300'
                                         }`}
                                         onClick={() => handlePlayTrack(track, index)}
                                     >
                                         {/* Index / Playing Indicator */}
                                         <div className="w-8 text-center">
-                                            {isPlaying ? (
+                                            {isPlaying ?  (
                                                 <span className="text-primary animate-pulse">🎵</span>
                                             ) : (
                                                 <span className="text-base-content/50 text-sm">{index + 1}</span>
@@ -112,7 +126,7 @@ const QueueList = ({ isOpen, onClose }) => {
 
                                         {/* Duration */}
                                         <span className="text-xs text-base-content/50">
-                      {formatDuration(track. duration)}
+                      {formatDuration(track.duration)}
                     </span>
 
                                         {/* Remove Button */}

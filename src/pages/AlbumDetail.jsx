@@ -28,8 +28,8 @@ const AlbumDetail = () => {
     }, [id, dispatch]);
 
     const handlePlayAll = () => {
-        if (album?. tracks?.length > 0) {
-            dispatch(playTrack({ track:  album.tracks[0], queue: album.tracks }));
+        if (album?.tracks?.length > 0) {
+            dispatch(playTrack({ track: album.tracks[0], queue: album.tracks }));
         }
     };
 
@@ -47,20 +47,31 @@ const AlbumDetail = () => {
         const audioUrl = `${getApiBase()}/api/track/${track. fileHash}/audio`;
         const link = document.createElement('a');
         link.href = audioUrl;
-        link. download = `${track.title || 'track'}.mp3`;
+        link.download = `${track.title || 'track'}.mp3`;
         link.target = '_blank';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
 
-    const formatDuration = (seconds) => {
-        if (seconds === null || seconds === undefined) return '--:--';
-        const num = Number(seconds);
-        if (isNaN(num) || ! isFinite(num) || num < 0) return '--:--';
-        const mins = Math.floor(num / 60);
-        const secs = Math.floor(num % 60);
-        return `${mins}:${secs. toString().padStart(2, '0')}`;
+    // Format duration - handles both string "MM: SS" and numeric seconds
+    const formatDuration = (duration) => {
+        if (!duration && duration !== 0) {
+            return '--:--';
+        }
+
+        if (typeof duration === 'string' && duration.includes(':')) {
+            return duration;
+        }
+
+        const seconds = Number(duration);
+        if (isNaN(seconds) || !isFinite(seconds) || seconds < 0) {
+            return duration.toString() || '--:--';
+        }
+
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     if (loading) {
@@ -71,7 +82,7 @@ const AlbumDetail = () => {
         );
     }
 
-    if (! album) {
+    if (!album) {
         return (
             <div className="text-center py-12">
                 <p className="text-4xl mb-4">😕</p>
@@ -81,25 +92,25 @@ const AlbumDetail = () => {
         );
     }
 
-    const artworkUrl = album. tracks?.[0]?. fileHash
-        ? `${getApiBase()}/api/track/${album. tracks[0].fileHash}/artwork`
+    const artworkUrl = album.tracks?.[0]?.fileHash
+        ? `${getApiBase()}/api/track/${album.tracks[0].fileHash}/artwork`
         : null;
 
     const albumName = album.name || 'Untitled Album';
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-24">
             {/* Album Header */}
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Artwork */}
-                <div className="w-48 h-48 mx-auto md:mx-0 rounded-2xl overflow-hidden bg-base-200 flex-shrink-0 shadow-lg">
+                <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto md:mx-0 rounded-2xl overflow-hidden bg-base-200 flex-shrink-0 shadow-lg">
                     {artworkUrl ?  (
                         <img
                             src={artworkUrl}
                             alt={albumName}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                                e. target.style.display = 'none';
+                                e.target.style.display = 'none';
                             }}
                         />
                     ) : (
@@ -112,11 +123,11 @@ const AlbumDetail = () => {
                 {/* Album Info */}
                 <div className="flex-1 text-center md:text-left">
                     <p className="text-sm text-base-content/50 uppercase tracking-wide">Album</p>
-                    <h1 className="text-3xl font-bold mt-1">{albumName}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold mt-1">{albumName}</h1>
                     <p className="text-base-content/60 mt-2">
-                        {album. tracks?.length || 0} {album.tracks?.length === 1 ? 'track' : 'tracks'}
+                        {album.tracks?.length || 0} {album.tracks?. length === 1 ? 'track' : 'tracks'}
                     </p>
-                    <div className="flex gap-3 mt-6 justify-center md:justify-start">
+                    <div className="flex gap-3 mt-6 justify-center md:justify-start flex-wrap">
                         <Button variant="primary" onClick={handlePlayAll}>
                             ▶️ Play All
                         </Button>
@@ -128,12 +139,12 @@ const AlbumDetail = () => {
             </div>
 
             {/* Track List */}
-            <div className="space-y-1">
-                {/* Header */}
+            <div className="space-y-2">
+                {/* Header - Desktop only */}
                 <div className="hidden sm:flex items-center gap-4 px-4 py-2 text-sm text-base-content/50 border-b border-base-200">
                     <span className="w-8 text-center">#</span>
                     <span className="flex-1">Title</span>
-                    <span className="w-32 text-center">Actions</span>
+                    <span className="w-24 text-center">Actions</span>
                     <span className="w-16 text-right">Duration</span>
                 </div>
 
@@ -141,24 +152,22 @@ const AlbumDetail = () => {
                 {album.tracks?.map((track, index) => (
                     <div
                         key={track.fileHash || index}
-                        className="flex items-center gap-4 p-4 hover:bg-base-200 rounded-xl cursor-pointer transition-colors group"
+                        className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-base-200 hover:bg-base-300 rounded-xl cursor-pointer transition-colors"
                         onClick={() => handlePlayTrack(track)}
                     >
                         {/* Track Number / Play Icon */}
-                        <span className="w-8 text-center text-base-content/50 group-hover:hidden">
-              {index + 1}
-            </span>
-                        <span className="w-8 text-center hidden group-hover:block text-primary">
-              ▶️
-            </span>
+                        <div className="w-8 flex-shrink-0 text-center">
+                            <span className="text-base-content/50 text-sm sm:hidden">▶️</span>
+                            <span className="text-base-content/50 text-sm hidden sm:inline">{index + 1}</span>
+                        </div>
 
                         {/* Track Info */}
                         <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{track. title || 'Untitled'}</p>
+                            <p className="font-medium text-sm truncate">{track.title || 'Untitled'}</p>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* Actions - Always visible */}
+                        <div className="flex items-center gap-1">
                             <button
                                 className="btn btn-ghost btn-xs btn-circle"
                                 onClick={(e) => handleDownload(e, track)}
@@ -175,14 +184,14 @@ const AlbumDetail = () => {
                             </button>
                         </div>
 
-                        {/* Duration */}
-                        <span className="w-16 text-right text-sm text-base-content/50">
+                        {/* Duration - Desktop only */}
+                        <span className="w-14 text-right text-sm text-base-content/50 hidden sm:block">
               {formatDuration(track.duration)}
             </span>
                     </div>
                 ))}
 
-                {(! album.tracks || album.tracks.length === 0) && (
+                {(! album.tracks || album.tracks. length === 0) && (
                     <p className="text-center text-base-content/50 py-8">No tracks in this album</p>
                 )}
             </div>
