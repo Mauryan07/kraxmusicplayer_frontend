@@ -1,35 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMe, selectAuthInitialized } from './features/auth/authSlice';
+import { setTheme } from './features/ui/uiSlice';
+import { setUnauthorizedHandler } from './api/httpClient';
+import { logout } from './features/auth/authSlice';
+import { showLoginModal, addToast } from './features/ui/uiSlice';
+import { AppShell } from './components/layout';
+import { Loader } from './components/common';
+import {
+    Home,
+    Tracks,
+    Albums,
+    AlbumDetail,
+    Search,
+    Admin,
+    NotFound,
+} from './pages';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+    const dispatch = useDispatch();
+    const authInitialized = useSelector(selectAuthInitialized);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    useEffect(() => {
+        // Initialize theme from localStorage
+        const savedTheme = localStorage. getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        dispatch(setTheme(savedTheme));
 
-export default App
+        // Check for existing session
+        const token = localStorage.getItem('basicToken');
+        if (token) {
+            dispatch(fetchMe());
+        } else {
+            // Mark as initialized even without token
+            dispatch({ type: 'auth/fetchMe/rejected' });
+        }
+
+        // Set up 401 handler for httpClient
+        setUnauthorizedHandler(() => {
+            dispatch(logout());
+            dispatch(addToast({
+                type: 'error',
+                message:  'Session expired — please login again',
+            }));
+            dispatch(showLoginModal());
+        });
+    }, [dispatch]);
+
+    // Show loader while checking auth status
+    if (! authInitialized) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-base-100">
+                <Loader size="lg" text="Loading..." />
+            </div>
+        );
+    }
+
+    return (
+        <Routes>
+            <Route path="/" element={<AppShell />}>
+                <Route index element={<Home />} />
+                <Route path="tracks" element={<Tracks />} />
+                <Route path="albums" element={<Albums />} />
+                <Route path="albums/:id" element={<AlbumDetail />} />
+                <Route path="search" element={<Search />} />
+                <Route path="admin" element={<Admin />} />
+                <Route path="*" element={<NotFound />} />
+            </Route>
+        </Routes>
+    );
+};
+
+export default App;
