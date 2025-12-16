@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     fetchHome,
     selectRecentTracks,
+    // selectHomeAlbums removed as it's no longer used
     selectHomeCounts,
     selectHomeLoading,
 } from '../features/home/homeSlice';
@@ -13,11 +14,11 @@ import { Loader } from '../components/common';
 const Home = () => {
     const dispatch = useDispatch();
     const recentTracks = useSelector(selectRecentTracks);
-    // const albums = useSelector(selectHomeAlbums); // Removed
     const counts = useSelector(selectHomeCounts);
     const loading = useSelector(selectHomeLoading);
 
     useEffect(() => {
+        // Set albumsLimit to 0 since we aren't displaying them
         dispatch(fetchHome({ tracksLimit: 12, albumsLimit: 0 }));
     }, [dispatch]);
 
