@@ -9,22 +9,33 @@ const PromoteDialog = ({ isOpen, onClose }) => {
     const [userId, setUserId] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handlePromote = async () => {
-        if (! userId. trim()) return;
+    const handleAction = async (e, action) => {
+        // Prevent form submission if inside a form
+        if(e && e.preventDefault) e.preventDefault();
+
+        if (!userId.trim()) return;
 
         setLoading(true);
+        const endpoint = action === 'promote'
+            ? `/api/admin/promote/${userId.trim()}`
+            : `/api/admin/demote/${userId.trim()}`;
+
+        const successMsg = action === 'promote'
+            ? `User ${userId} promoted to admin`
+            : `User ${userId} demoted from admin`;
+
         try {
-            await httpClient.post(`/api/admin/promote/${userId. trim()}`);
+            await httpClient.post(endpoint);
             dispatch(addToast({
                 type: 'success',
-                message: `User ${userId} promoted to admin`,
+                message: successMsg,
             }));
             setUserId('');
             onClose();
         } catch (error) {
             dispatch(addToast({
                 type: 'error',
-                message: error.response?.data?.message || 'Failed to promote user',
+                message: error.response?.data?.message || `Failed to ${action} user`,
             }));
         } finally {
             setLoading(false);
@@ -40,11 +51,12 @@ const PromoteDialog = ({ isOpen, onClose }) => {
                 <button
                     className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
                     onClick={onClose}
+                    type="button"
                 >
                     ✕
                 </button>
 
-                <h3 className="font-bold text-lg mb-4">Promote User to Admin</h3>
+                <h3 className="font-bold text-lg mb-4">Manage User Roles</h3>
 
                 <Input
                     label="User ID or Username"
@@ -54,18 +66,35 @@ const PromoteDialog = ({ isOpen, onClose }) => {
                 />
 
                 <p className="text-sm text-base-content/70 mt-2">
-                    This will grant admin privileges to the specified user.
+                    Promote a user to Admin or Demote them back to standard user.
                 </p>
 
-                <div className="modal-action">
-                    <Button variant="ghost" onClick={onClose} disabled={loading}>
+                <div className="modal-action flex justify-end gap-2">
+                    <Button
+                        variant="ghost"
+                        onClick={onClose}
+                        disabled={loading}
+                        type="button"
+                    >
                         Cancel
                     </Button>
+
+                    <Button
+                        className="btn-error text-white"
+                        onClick={(e) => handleAction(e, 'demote')}
+                        disabled={!userId.trim() || loading}
+                        loading={loading}
+                        type="button"
+                    >
+                        Demote
+                    </Button>
+
                     <Button
                         variant="secondary"
-                        onClick={handlePromote}
-                        disabled={! userId.trim() || loading}
+                        onClick={(e) => handleAction(e, 'promote')}
+                        disabled={!userId.trim() || loading}
                         loading={loading}
+                        type="button"
                     >
                         Promote
                     </Button>

@@ -4,10 +4,10 @@ import {
     fetchAlbums,
     selectAlbums,
     selectAlbumsLoading,
-    selectAlbumsError,
+    selectAlbumsError
 } from '../features/albums/albumsSlice';
 import { AlbumCard } from '../components/cards';
-import { Loader, Button } from '../components/common';
+import { Loader } from '../components/common';
 
 const Albums = () => {
     const dispatch = useDispatch();
@@ -29,36 +29,31 @@ const Albums = () => {
 
     if (error) {
         return (
-            <div className="text-center py-12">
-                <p className="text-4xl mb-4">😕</p>
-                <p className="text-error mb-4">Error: {error}</p>
-                <Button onClick={() => dispatch(fetchAlbums())}>Try Again</Button>
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="text-error text-xl mb-2">Error Loading Albums</div>
+                <p className="text-base-content/60 mb-4">{error}</p>
+                <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => dispatch(fetchAlbums())}
+                >
+                    Try Again
+                </button>
             </div>
         );
     }
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between gap-4">
-                <h1 className="text-3xl font-bold">Albums</h1>
-            </div>
+            <h1 className="text-3xl font-bold">Albums</h1>
+
             {albums.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                     {albums.map((album, index) => (
-                        <AlbumCard
-                            key={album.id || album.name || index}
-                            album={album}
-                        />
+                        <AlbumCard key={album.id || album.album || index} album={album} />
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-16">
-                    <p className="text-6xl mb-4">💿</p>
-                    <p className="text-xl text-base-content/70">No albums found</p>
-                    <p className="text-sm text-base-content/50 mt-2">
-                        Upload tracks with album metadata
-                    </p>
-                </div>
+                <p className="text-base-content/50 text-center py-12">No albums found</p>
             )}
         </div>
     );
