@@ -193,15 +193,21 @@ const BottomPlayer = () => {
                                     </div>
                                 )}
                             </div>
+
                             {/* Track Info */}
-                            <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm truncate">
-                                    {currentTrack.title || 'Untitled'}
-                                </p>
+                            <div
+                                className="flex-1 min-w-0 cursor-pointer"
+                                onClick={() => setExpanded(true)}
+                            >
+                                {/* Replaced static title with Marquee */}
+                                <div className="font-medium text-sm overflow-hidden text-base-content">
+                                    <MarqueeTrackTitle title={currentTrack.title || 'Untitled'} />
+                                </div>
                                 {subtitle && (
                                     <p className="text-xs text-base-content/60 truncate">{subtitle}</p>
                                 )}
                             </div>
+
                             {/* Controls */}
                             <div className="flex items-center gap-1 sm:gap-2">
                                 {!isDesktop && (
@@ -230,6 +236,15 @@ const BottomPlayer = () => {
                                             ) : (
                                                 SVG.play
                                             )}
+                                        </button>
+
+                                        {/* Added Next Button for Mobile */}
+                                        <button
+                                            className="rounded-full bg-base-300 hover:bg-primary/60 transition-colors p-2 text-base-content/60"
+                                            onClick={() => dispatch(playNext())}
+                                            title="Next"
+                                        >
+                                            {SVG.next}
                                         </button>
                                     </>
                                 )}

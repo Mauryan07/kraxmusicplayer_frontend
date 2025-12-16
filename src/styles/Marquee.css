@@ -16,13 +16,11 @@
     bottom: 0;
     z-index: 2;
 }
-.marquee-fade-left {
-    left: 0;
-    background: linear-gradient(to right, #1a1a1a 75%, transparent); /* match your bg-base-200 or bg-base-300! */
+.dark .marquee-fade-left {
+    background: linear-gradient(to right, #18181b 80%, transparent);
 }
-.marquee-fade-right {
-    right: 0;
-    background: linear-gradient(to left, #1a1a1a 75%, transparent); /* match bg */
+.dark .marquee-fade-right {
+    background: linear-gradient(to left, #18181b 80%, transparent);
 }
 
 .marquee {
