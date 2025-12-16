@@ -4,22 +4,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     fetchHome,
     selectRecentTracks,
-    selectHomeAlbums,
     selectHomeCounts,
     selectHomeLoading,
 } from '../features/home/homeSlice';
-import { TrackCardWithArtwork, AlbumCard } from '../components/cards';
+import { TrackCardWithArtwork } from '../components/cards'; // Removed AlbumCard
 import { Loader } from '../components/common';
 
 const Home = () => {
     const dispatch = useDispatch();
     const recentTracks = useSelector(selectRecentTracks);
-    const albums = useSelector(selectHomeAlbums);
+    // const albums = useSelector(selectHomeAlbums); // Removed
     const counts = useSelector(selectHomeCounts);
     const loading = useSelector(selectHomeLoading);
 
     useEffect(() => {
-        dispatch(fetchHome({ tracksLimit: 12, albumsLimit: 8 }));
+        dispatch(fetchHome({ tracksLimit: 12, albumsLimit: 0 }));
     }, [dispatch]);
 
     if (loading && recentTracks.length === 0) {
@@ -108,41 +107,6 @@ const Home = () => {
                 )}
             </section>
 
-            {/* Albums */}
-            <section>
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold">💿 Albums</h2>
-                    <Link to="/albums" className="btn btn-ghost btn-sm">
-                        View All →
-                    </Link>
-                </div>
-                {albums.length > 0 ?  (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        {albums.slice(0, 8).map((album, index) => (
-                            <AlbumCard
-                                key={album. name || index}
-                                album={{
-                                    name: album.name,
-                                    album: album.name,
-                                    trackCount: album.trackCount,
-                                    // Pass the first track's fileHash for artwork
-                                    firstTrackHash: album.sampleTracks?.[0]?.fileHash || null,
-                                    tracks: album.sampleTracks?.map((t) => ({
-                                        fileHash: t.fileHash,
-                                        title: t.title,
-                                        duration: t. duration,
-                                    })),
-                                }}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-12 bg-base-200 rounded-2xl">
-                        <p className="text-4xl mb-2">💿</p>
-                        <p className="text-base-content/50">No albums yet</p>
-                    </div>
-                )}
-            </section>
         </div>
     );
 };
