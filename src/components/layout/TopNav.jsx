@@ -93,7 +93,7 @@ const TopNav = () => {
                         <div tabIndex={0} role="button" className="btn btn-ghost gap-2">
                             <div className="avatar placeholder">
                                 <div className="bg-primary text-primary-content rounded-full w-8">
-                                    <span className="text-sm uppercase">{username?. charAt(0) || 'U'}</span>
+                                    <span className="text-xl uppercase">{username?. charAt(0) || 'U'}</span>
                                 </div>
                             </div>
                             <span className="hidden sm:inline max-w-24 truncate">{username}</span>
